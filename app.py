@@ -123,7 +123,8 @@ def valid_source(url):
         addresses = socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)
     except socket.gaierror as exc:
         raise ValueError("来源域名无法解析") from exc
-    if not addresses or any(not ipaddress.ip_address(result[4][0]).is_global for result in addresses):
+    proxy_range = ipaddress.ip_network("198.18.0.0/15")
+    if not addresses or any(not (ipaddress.ip_address(result[4][0]).is_global or ipaddress.ip_address(result[4][0]) in proxy_range) for result in addresses):
         raise ValueError("不允许内网或保留地址")
     return url
 
